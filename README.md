@@ -16,6 +16,24 @@ Please see the **[Documentation](https://condense.moe/)** for installation and u
 - Optionally include the OP and EP in your condensed audio
 - Works with single files or whole folders
 
+## Usage Examples
+
+Run commands from the `koemoe/` directory.
+
+Create the default WAV output:
+
+```bash
+python condense.py "/path/to/anime.mkv"
+```
+
+Create an MP3 output:
+
+```bash
+python condense.py "/path/to/anime.mkv" -f '$name$_condensed.mp3'
+```
+
+`$name$` is replaced with the input file name.
+
 ## Support
 
 -   For questions or discussions use **[Discussions](https://github.com/mcgrizzz/Koemoe/discussions)**.
