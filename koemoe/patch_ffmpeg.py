@@ -12,7 +12,7 @@ import json
 
 #money patch utf-8 encoding into ffprobe.probe
 def probe(media_filename, *,
-        communicate_timeout=10.0,  # a timeout in seconds
+        communicate_timeout=30.0,  # a timeout in seconds
         ffprobe_cmd_override=None,
         verify_local_mediafile=True):
 
@@ -60,19 +60,28 @@ def probe(media_filename, *,
     except subprocess.SubprocessError as e:
         raise FFprobePopenError(e, 'subprocess.SubprocessError') from e
 
+    timed_out = False
     try:
         (outs, errs) = proc.communicate(timeout=communicate_timeout)
     except subprocess.TimeoutExpired:
+        timed_out = True
         proc.kill()
         (outs, errs) = proc.communicate()
+
+    exit_status = proc.returncode
+    if timed_out:
+        raise FFprobeSubprocessError(
+            split_cmdline,
+            exit_status,
+            f"ffprobe timed out after {communicate_timeout} seconds. {errs}",
+        )
+    if exit_status != 0:
+        raise FFprobeSubprocessError(split_cmdline, exit_status, errs)
 
     try:
         parsed_json = json.loads(outs)
     except json.decoder.JSONDecodeError as e:
         raise FFprobeJsonParseError(e, 'json.decoder.JSONDecodeError') from e
-    exit_status = proc.returncode
-    if exit_status != 0:
-        raise FFprobeSubprocessError(split_cmdline, exit_status, errs)
 
     return FFprobe(split_cmdline=split_cmdline, parsed_json=parsed_json)
 

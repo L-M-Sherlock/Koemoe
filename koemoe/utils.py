@@ -6,12 +6,12 @@ import sys
 import warnings
 import enlighten
 import contextlib
-import pkg_resources
 
 from pathlib import Path
 from enlighten._counter import Counter 
 from functools import partial
 from dataclasses import dataclass, field
+from packaging.version import parse as parse_version
 
 progress_colors = [[237, 226, 225], [247, 117, 105]]
 
@@ -143,10 +143,10 @@ def nowarning():
 def get_latest_model():
     models = os.listdir(Path("./model"))
     models.remove('.gitkeep')
-    latest_version = ("None", pkg_resources.parse_version("0.0"))
+    latest_version = ("None", parse_version("0.0"))
     for file_name in models:
         file = Path(file_name).stem
-        version = pkg_resources.parse_version(file.split("_")[-1])
+        version = parse_version(file.split("_")[-1])
         if version > latest_version[1]:
             latest_version = (file_name, version)
     return latest_version[0]
